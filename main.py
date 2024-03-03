@@ -2,34 +2,13 @@ import mediapipe as mp
 import cv2 as cv
 import numpy as np
 import pyautogui
-import AppKit # Apple specific
 from gestures import GestureClassifier
-
-def get_screen_info():
-    screens = AppKit.NSScreen.screens()
-    screen_info = []
-    for screen in screens:
-        frame = screen.frame()
-        screen_info.append({
-            "x": frame.origin.x,
-            "y": frame.origin.y,
-            "width": frame.size.width,
-            "height": frame.size.height
-        })
-    return screen_info
-
-def scale_to_monitor(x, y, monitor_index=0):
-    screen_info = get_screen_info()
-    monitor = screen_info[monitor_index]
-    scaled_x = int(x * monitor["width"]) + monitor["x"]
-    scaled_y = int(y * monitor["height"]) + monitor["y"]
-    return scaled_x, scaled_y
 
 def main():
     gestures = GestureClassifier()
     cap = cv.VideoCapture(0)
 
-    SCREEN_WIDTH, SCREEN_HEIGHT = pyautogui.size()
+    sensitivty_multiplier = 1.25
     
     mp_hands = mp.solutions.hands
     hands = mp_hands.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5)
@@ -47,7 +26,7 @@ def main():
         
         # Flip the image against the y-axis
         frame_flipped = cv.flip(frame, 1)
-        
+
         # black background
         hand_space = np.zeros_like(frame_flipped)
         
@@ -82,17 +61,14 @@ def main():
                     x1, y1 = hand_coordinates[connection[1]]
                     cv.line(hand_space, (x0, y0), (x1, y1), (255, 0, 0), 2)
 
-            wrist_x, wrist_y = hand_coordinates_list[0][mp_hands.HandLandmark.WRIST]
-
-            # map wrist coordinates to screen coordinates
-            cursor_x = int(wrist_x * SCREEN_WIDTH)
-            cursor_y = int(wrist_y * SCREEN_HEIGHT)
+            wrist_x, wrist_y = hand_coordinates_list[0][mp_hands.HandLandmark.INDEX_FINGER_TIP]
+            
+            # increase mouse sensitivity
+            wrist_x *= sensitivty_multiplier
+            wrist_y *= sensitivty_multiplier
 
             # move the cursor to the mapped position
-            # pyautogui.moveTo(cursor_x, cursor_y)
             pyautogui.moveTo(wrist_x, wrist_y)
-            # scaled_x, scaled_y = scale_to_monitor(wrist_x, wrist_y, 1)
-            # pyautogui.moveTo(scaled_x, scaled_y)
 
 
         cv.imshow("Hand Tracking", hand_space)
