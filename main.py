@@ -15,8 +15,6 @@ def main():
     
     # predefined hand landmark connections
     connections = mp_hands.HAND_CONNECTIONS
-    # use to count number of actions
-    counter = 0
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -24,7 +22,7 @@ def main():
         if not ret:
             break
         
-        # Flip the image against the y-axis
+        # flip the image on y-axis
         frame_flipped = cv.flip(frame, 1)
 
         # black background
@@ -45,31 +43,32 @@ def main():
             for hand_landmarks in results.multi_hand_landmarks:
                 hand_landmarks_list.append(hand_landmarks)
                 hand_coordinates = []
+
                 for landmark in hand_landmarks.landmark:
                     # get pixel coordinates
                     x, y = int(landmark.x * hand_space.shape[1]), int(landmark.y * hand_space.shape[0])
                     hand_coordinates.append((x, y))
                     # draw a point on detected landmark
                     cv.circle(hand_space, (x, y), 5, (0, 0, 255), -1)
+
                 hand_coordinates_list.append(hand_coordinates)
 
             for hand_coordinates in hand_coordinates_list:
-            
+
                 # connect handlandmarks with lines
                 for connection in connections:
                     x0, y0 = hand_coordinates[connection[0]]
                     x1, y1 = hand_coordinates[connection[1]]
                     cv.line(hand_space, (x0, y0), (x1, y1), (255, 0, 0), 2)
 
-            wrist_x, wrist_y = hand_coordinates_list[0][mp_hands.HandLandmark.INDEX_FINGER_TIP]
+            finger_x, finger_y = hand_coordinates_list[0][mp_hands.HandLandmark.INDEX_FINGER_TIP]
             
             # increase mouse sensitivity
-            wrist_x *= sensitivty_multiplier
-            wrist_y *= sensitivty_multiplier
+            finger_x *= sensitivty_multiplier
+            finger_y *= sensitivty_multiplier
 
             # move the cursor to the mapped position
-            pyautogui.moveTo(wrist_x, wrist_y)
-
+            pyautogui.moveTo(finger_x, finger_y)
 
         cv.imshow("Hand Tracking", hand_space)
 
