@@ -2,7 +2,7 @@ import mediapipe as mp
 import cv2 as cv
 import numpy as np
 import pyautogui
-from gestures import GestureClassifier  # Make sure this import works based on your file structure
+from gestures import GestureClassifier
 
 def main():
     # Initialize GestureClassifier
