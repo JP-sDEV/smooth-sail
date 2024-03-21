@@ -4,13 +4,13 @@ import numpy as np
 import pyautogui
 from gestures import GestureClassifier
 
+# Sensitivity multiplier for cursor movement
+MOUSE_SENSITVITY_MULTIPLIER = 1.25
+
 def main():
     # Initialize GestureClassifier
     gesture_classifier = GestureClassifier()
     cap = cv.VideoCapture(0)
-
-    # Sensitivity multiplier for cursor movement
-    sensitivty_multiplier = 1.25
 
     mp_hands = mp.solutions.hands
     hands = mp_hands.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5)
@@ -31,10 +31,19 @@ def main():
 
         results = hands.process(image)
 
+        # get hand landmarks and coordinates
+        hand_landmarks_list = []
+        hand_coordinates_list = []
+
+        # hands detected
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
-                # Draw landmarks and connections
+                hand_landmarks_list.append(hand_landmarks)
                 hand_coordinates = []
+
+            for hand_landmarks in results.multi_hand_landmarks:
+                # Draw landmarks and connections
+                # hand_coordinates = []
                 for idx, landmark in enumerate(hand_landmarks.landmark):
                     x, y = int(landmark.x * hand_space.shape[1]), int(landmark.y * hand_space.shape[0])
                     hand_coordinates.append((x, y))
@@ -49,6 +58,8 @@ def main():
                 # Classify gesture for the first detected hand
                 gesture = gesture_classifier.classify_gesture(hand_coordinates)
 
+                print(hand_coordinates)
+
                 # Example actions based on gesture
                 if gesture == "Single Tap":
                     print("Single Tap Detected")  
@@ -56,6 +67,16 @@ def main():
                     print("Single Middle Tap")  
                 elif gesture == "Single Tap and Hold":
                     print("Single Tap and Hold Detected")  
+
+                hand_coordinates_list.append(hand_coordinates)
+                finger_x, finger_y = hand_coordinates_list[0][mp_hands.HandLandmark.INDEX_FINGER_TIP]
+            
+                # increase mouse sensitivity
+                finger_x *= MOUSE_SENSITVITY_MULTIPLIER
+                finger_y *= MOUSE_SENSITVITY_MULTIPLIER
+
+                # move the cursor to the mapped position
+                pyautogui.moveTo(finger_x, finger_y)
 
         cv.imshow("Hand Tracking", hand_space)
 
