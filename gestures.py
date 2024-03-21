@@ -1,7 +1,7 @@
 import time
 import mediapipe as mp 
 
-THRESHOLD = 28.0
+THRESHOLD = 75.0
 
 class GestureClassifier:
     def __init__(self):
