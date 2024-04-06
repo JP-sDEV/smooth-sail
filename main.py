@@ -81,7 +81,7 @@ def main():
                     finger_y *= MOUSE_SENSITVITY_MULTIPLIER
 
                     # move the cursor to the mapped position
-                    pyautogui.moveTo(finger_x, finger_y, MOUSE_MOVEMENT_DELAY,  pyautogui.easeInQuad)
+                    pyautogui.moveTo(finger_x, finger_y, MOUSE_MOVEMENT_DELAY, tween = pyautogui.easeInQuad)
 
         cv.imshow("Hand Tracking", hand_space)
 
