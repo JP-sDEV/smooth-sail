@@ -65,16 +65,19 @@ def main():
 
                 # Example actions based on gesture
                 if gesture == "Single Tap":
-                    print("Single Tap Detected")  
+                    print("Single Tap Detected")
+                    pyautogui.click(button = "left")
                 elif gesture == "Single Middle Tap":
                     print("Single Middle Tap")  
+                    pyautogui.click(button = "right")
                 elif gesture == "Single Tap and Hold":
                     print("Single Tap and Hold Detected")  
+                    pyautogui.click(button = "left")
 
                 if (frame_count % FRAME_SKIP == 0):
                     hand_coordinates_list.append(hand_coordinates)
 
-                    finger_x, finger_y = hand_coordinates_list[0][mp_hands.HandLandmark.INDEX_FINGER_TIP]
+                    finger_x, finger_y = hand_coordinates_list[0][mp_hands.HandLandmark.MIDDLE_FINGER_MCP]
                 
                     # increase mouse sensitivity
                     finger_x *= MOUSE_SENSITVITY_MULTIPLIER
